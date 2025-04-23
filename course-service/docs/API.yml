@@ -1,0 +1,219 @@
+openapi: 3.0.0
+info:
+  title: Learning Platform - CourseService API
+  description: API for managing courses and course content
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3001/api
+    description: Course Service
+
+paths:
+  /api/courses/create:
+    post:
+      summary: Create a new course
+      description: Consumes data from CourseService to create a new course
+      tags:
+        - Courses
+      security:
+        - bearerAuth: [] # Add security scheme reference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreation"
+      responses:
+        "201":
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: "Calculus 101"
+                  description:
+                    type: string
+                    example: "Introduction to Calculus"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2025-02-01T08:00:00Z"
+        "400":
+          description: Invalid input
+
+  /api/courses/user:
+    get:
+      summary: Get course list for a user
+      tags:
+        - Courses
+      security:
+        - bearerAuth: [] # Add security scheme reference
+      responses:
+        "200":
+          description: List of user's courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+        "404":
+          description: User not found
+
+  /api/courses/{courseId}:
+    get:
+      summary: Get course details and enrolled students
+      description: Fetches course details along with the list of enrolled students
+      tags:
+        - Courses
+      security:
+        - bearerAuth: [] # Add security scheme reference
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Course details with enrolled students
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: "Calculus 101"
+                  description:
+                    type: string
+                    example: "Introduction to Calculus"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2025-02-01T08:00:00Z"
+                  students:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Anaking Faiqal"
+        "404":
+          description: Course not found
+
+  /api/courses/enroll/{courseId}:
+    post:
+      summary: Enroll a user in a course
+      description: Enrolls the authenticated user in a specific course
+      tags:
+        - Courses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: User successfully enrolled in the course
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User successfully enrolled in the course"
+        "400":
+          description: Invalid input
+        "404":
+          description: Course not found
+
+  /api/courses:
+    get:
+      summary: Get all courses
+      description: Retrieves a list of all available courses
+      tags:
+        - Courses
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of all courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+
+components:
+  schemas:
+    CourseCreation:
+      type: object
+      required:
+        - title
+        - description
+        - userId
+      properties:
+        title:
+          type: string
+          example: "Calculus 101"
+        description:
+          type: string
+          example: "Learn the basics Calculus"
+        userId:
+          type: integer
+          example: 1
+
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Calculus 101"
+        description:
+          type: string
+          example: "Introduction to Calculus"
+        instructorName:
+          type: string
+          example: "Dr. Muhammad Ali"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-02-01T08:00:00Z"
+
+    EnrollmentWithStudent:
+      type: object
+      properties:
+        studentId:
+          type: integer
+          example: 1
+        studentName:
+          type: string
+          example: "Anaking Faiqal"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Optional, specifies the format of the token
