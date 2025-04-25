@@ -44,6 +44,11 @@ COURSE_SERVICE_URL=
 JWT_SECRET=
 ```
 
+## Lakukan migrasi database di masing-masing layanan
+```bash
+npx prisma migrate deploy
+```
+
 ## 
 
 Selanjutnya tinggal jalankan kedua service menggunakan 
